@@ -1,87 +1,92 @@
 "use client";
-import { Calendar } from "@/components/ui/calendar";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import axios from "axios";
+import { questionApi, type Question } from "@/lib/api/questions";
 import { MoreVertical } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import React, { useEffect } from "react";
-
+import { toast } from "sonner";
 import Header from "@/components/Header";
+import React from "react";
+
+enum Language {
+  PYTHON = "python",
+  JAVA = "java",
+  CPP = "cpp",
+  JAVASCRIPT = "javascript"
+}
+
 interface CodeSnippet {
-  lang: string;
-  langSlug: string;
+  language: Language;
   code: string;
+  template?: boolean;
+  is_starter_code?: boolean;
 }
 
 interface TestCase {
+  id: string;
   input: string;
-  expectedOutput: string;
+  expected_output: string;
+  timeout_ms?: number;
+  memory_limit_mb?: number;
+  is_hidden?: boolean;
 }
 
-interface Question {
-  _id: string;
-  level: string;
-  topics: string[];
-  companies: string[];
-  title: string;
-  "title-slug": string;
-  likes: number;
-  dislikes: number;
-  content: string;
-  codeSnippets: CodeSnippet[];
-  testCases: TestCase;
-  __v: number;
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://algotutor-backend-555118069489.asia-south1.run.app';
 
 export default function Home() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [loading, setLoading] = React.useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [userName, setUserName] = useState<string>('Guest');
 
-  const categories = [
-    { name: "Array", count: 1374 },
-    { name: "String", count: 612 },
-    { name: "Hash Table", count: 472 },
-    { name: "Math", count: 429 },
-    { name: "Dynamic Programming", count: 428 },
-    { name: "Sorting", count: 315 },
-    { name: "Greedy", count: 307 },
-    { name: "Depth-First Search", count: 274 },
-    { name: "Database", count: 225 },
-    { name: "Binary Search", count: 224 },
-    { name: "Breadth-First Search", count: 218 },
-    { name: "Tree", count: 214 },
-    { name: "Matrix", count: 196 },
-    { name: "Two Pointers", count: 171 },
-    { name: "Binary Tree", count: 169 },
-    { name: "Bit Manipulation", count: 161 },
-    { name: "Heap (Priority Queue)", count: 142 },
-    { name: "Stack", count: 141 },
-    { name: "Graph", count: 128 },
-    { name: "Prefix Sum", count: 127 },
-  ];
-
-  const [questions, setQuestions] = React.useState<Question[]>([]);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedName = localStorage.getItem('userName');
+      if (!storedName) {
+        const name = prompt('Please enter your name to continue:');
+        if (name) {
+          localStorage.setItem('userName', name);
+          setUserName(name);
+        }
+      } else {
+        setUserName(storedName);
+      }
+    }
+  }, []);
 
   const getDifficultyColor = (difficulty: string) => {
-    if (difficulty == "easy") {
-      return "text-green-500";
-    } else if (difficulty == "medium") {
-      return "text-yellow-500";
-    } else {
-      return "text-red-500";
+    switch (difficulty.toLowerCase()) {
+      case "easy":
+        return "text-green-500 bg-green-500/10";
+      case "medium":
+        return "text-yellow-500 bg-yellow-500/10";
+      case "hard":
+        return "text-red-500 bg-red-500/10";
+      default:
+        return "text-gray-500 bg-gray-500/10";
     }
   };
 
   const getQuestions = async () => {
     try {
-      const result = await axios.get(
-        process.env.NEXT_PUBLIC_API_URL + "/questions/get"
-      );
-      setQuestions(result.data);
+      const userName = localStorage.getItem('userName');
+      if (!userName) {
+        toast.error('Please enter your name to continue');
+        setLoading(false);
+        return;
+      }
+
+      const questions = await questionApi.list();
+      
+      setQuestions(Array.isArray(questions) ? questions : []);
       setLoading(false);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+
+      toast.error(error?.response?.data?.detail || "Failed to load questions. Please try again.");
+      setLoading(false);
     }
   };
 
@@ -89,83 +94,71 @@ export default function Home() {
     getQuestions();
   }, []);
 
-  return (
-    <main className="flex h-screen dark bg-black p-4  w-screen flex-col ">
-      <Header />
-      <div className="flex flex-wrap gap-2 p-12 pt-4 pb-0 mt-4">
-        {categories.map((item, i) => (
-          <div className="px-4 cursor-pointer py-2 text-gray-400 bg-gray-700 rounded-3xl">
-            {item.name}
-          </div>
-        ))}
-      </div>
+  useEffect(() => {
+    if (!isAuthenticated) {
+      window.location.href = '/auth/login';
+    }
+  }, [isAuthenticated]);
 
-      <div className="flex gap-8 text-white p-12">
-        <div className="flex-[8] w-full">
-          <span className="text-[2rem] tracking-widest ">Questions </span>
-          <div className="w-full flex mt-12 mb-2">
-            <span className="w-full text-[1.25rem] pl-4 tracking-widest text-gray-600">
+  return (
+    <main className="flex h-screen dark bg-black w-screen flex-col">
+      <header className="bg-gray-900 border-b border-gray-800 p-4">
+        <div className="flex justify-between items-center max-w-7xl mx-auto">
+          <h1 className="text-2xl font-semibold text-white">Algorithm Tutor</h1>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-300">Welcome, {userName}</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 p-8 max-w-7xl mx-auto w-full">
+        <div className="w-full">
+          <h2 className="text-2xl text-white font-semibold mb-8">Questions</h2>
+          <div className="w-full flex mb-4">
+            <span className="w-full pl-4 text-sm font-medium text-gray-400">
               Title
             </span>
-            <span className="w-[20%] text-[1.25rem] tracking-widest text-gray-600">
+            <span className="w-32 text-sm font-medium text-gray-400">
               Difficulty
             </span>
-            <span className="w-[20%] text-[1.25rem] tracking-widest text-gray-600"></span>
           </div>
 
           {loading ? (
             <>
-              {Array.from({ length: 5 }).map((item, i) => (
-                <div
-                  className={cn(
-                    i % 2 == 0 ? "" : "",
-                    "py-[10px] w-full flex justify-between bg-opacity-30 text-gray-300 px-2"
-                  )}
-                >
-                  <Skeleton className="w-[60%] h-[20px]" />
-                  <Skeleton className="w-[20%] h-[20px]" />
-                  <Skeleton className="w-[10%] h-[20px]" />
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="py-2 w-full flex justify-between text-gray-300 px-2">
+                  <Skeleton className="w-[60%] h-5" />
+                  <Skeleton className="w-[20%] h-5" />
                 </div>
               ))}
             </>
           ) : (
             <>
-              {questions?.map((item, i) => (
-                <div
-                  className={cn(
-                    i % 2 == 0 ? "bg-gray-500" : "",
-                    "py-[10px] w-full flex bg-opacity-30 text-gray-300 px-2"
-                  )}
+              {(Array.isArray(questions) ? questions : []).map((question, i) => (
+                <Link 
+                  href={`/question/${question.title_slug}`} 
+                  key={question._id} 
+                  className="w-full flex items-center p-4 hover:bg-gray-800/50 rounded-lg cursor-pointer transition-colors"
                 >
-                  <Link
-                    href={`/question/${item["title-slug"]}`}
-                    className="w-full pl-2"
-                  >
-                    {item.title}
-                  </Link>
+                  <div className="w-full pl-4">
+                    <span className="text-white">{question.title}</span>
+                    <div className="flex gap-2 mt-1">
+                      {question.topics.map(topic => (
+                        <span key={topic} className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{topic}</span>
+                      ))}
+                    </div>
+                  </div>
                   <span
-                    className={cn(
-                      getDifficultyColor(item.level),
-                      "w-[20%] capitalize "
-                    )}
+                    className={`px-3 py-1 rounded-full text-sm ${getDifficultyColor(
+                      question.level
+                    )}`}
                   >
-                    {item.level}
+                    {question.level}
                   </span>
-                  <span className="w-[20%] text-opacity-40 cursor-pointer">
-                    <MoreVertical />
-                  </span>
-                </div>
+                </Link>
               ))}
             </>
           )}
-        </div>
-        <div className="flex-[2]">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            className="rounded-md border"
-          />
         </div>
       </div>
     </main>
