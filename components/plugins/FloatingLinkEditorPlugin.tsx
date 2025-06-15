@@ -14,7 +14,6 @@ import {
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
-  GridSelection,
   KEY_ESCAPE_COMMAND,
   LexicalEditor,
   NodeSelection,
@@ -25,9 +24,9 @@ import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
 import * as React from "react";
 import { createPortal } from "react-dom";
 
-import { getSelectedNode } from "../utils/getSelectedNode";
-import { setFloatingElemPositionForLinkEditor } from "../utils/setFloatingElemPositionForLinkEditor";
-import { sanitizeUrl } from "../utils/url";
+import { getSelectedNode } from "@/lib/getSelectedNode";
+import { setFloatingElemPositionForLinkEditor } from "@/lib/setFloatingElemPositionForLinkEditor";
+import { sanitizeUrl } from "@/lib/url";
 
 function FloatingLinkEditor({
   editor,
@@ -48,9 +47,7 @@ function FloatingLinkEditor({
   const inputRef = useRef<HTMLInputElement>(null);
   const [linkUrl, setLinkUrl] = useState("");
   const [editedLinkUrl, setEditedLinkUrl] = useState("https://");
-  const [lastSelection, setLastSelection] = useState<
-    RangeSelection | GridSelection | NodeSelection | null
-  >(null);
+  const [lastSelection, setLastSelection] = useState<any>(null);
 
   const updateLinkEditor = useCallback(() => {
     const selection = $getSelection();

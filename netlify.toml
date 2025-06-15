@@ -1,0 +1,12 @@
+[build]
+
+[build.environment]
+  NEXT_PUBLIC_API_URL = "https://algotutor-backend-555118069489.asia-south1.run.app"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

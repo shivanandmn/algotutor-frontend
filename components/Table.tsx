@@ -26,7 +26,15 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-export function DataTable({ columns, data }) {
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
+
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+}: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -90,12 +98,19 @@ export function DataTable({ columns, data }) {
   );
 }
 
+interface PaginationSectionProps {
+  totalItems: number;
+  itemsPerPage: number;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+}
+
 export const PaginationSection = ({
   totalItems,
   itemsPerPage,
   currentPage,
   setCurrentPage,
-}) => {
+}: PaginationSectionProps) => {
   let pages = [];
 
   for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {

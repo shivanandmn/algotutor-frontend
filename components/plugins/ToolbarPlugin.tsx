@@ -11,7 +11,7 @@ import {
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  DEPRECATED_$isGridSelection,
+
   FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
   INDENT_CONTENT_COMMAND,
@@ -130,10 +130,7 @@ function BlockFormatDropDown({
   const formatParagraph = () => {
     editor.update(() => {
       const selection = $getSelection();
-      if (
-        $isRangeSelection(selection) ||
-        DEPRECATED_$isGridSelection(selection)
-      ) {
+      if (selection && $isRangeSelection(selection)) {
         $setBlocksType(selection, () => $createParagraphNode());
       }
     });
@@ -143,10 +140,7 @@ function BlockFormatDropDown({
     if (blockType !== headingSize) {
       editor.update(() => {
         const selection = $getSelection();
-        if (
-          $isRangeSelection(selection) ||
-          DEPRECATED_$isGridSelection(selection)
-        ) {
+        if (selection && $isRangeSelection(selection)) {
           $setBlocksType(selection, () => $createHeadingNode(headingSize));
         }
       });
@@ -181,10 +175,7 @@ function BlockFormatDropDown({
     if (blockType !== "quote") {
       editor.update(() => {
         const selection = $getSelection();
-        if (
-          $isRangeSelection(selection) ||
-          DEPRECATED_$isGridSelection(selection)
-        ) {
+        if (selection && $isRangeSelection(selection)) {
           $setBlocksType(selection, () => $createQuoteNode());
         }
       });
@@ -194,22 +185,9 @@ function BlockFormatDropDown({
   const formatCode = () => {
     if (blockType !== "code") {
       editor.update(() => {
-        let selection = $getSelection();
-
-        if (
-          $isRangeSelection(selection) ||
-          DEPRECATED_$isGridSelection(selection)
-        ) {
-          if (selection.isCollapsed()) {
-            $setBlocksType(selection, () => $createCodeNode());
-          } else {
-            const textContent = selection.getTextContent();
-            const codeNode = $createCodeNode();
-            selection.insertNodes([codeNode]);
-            selection = $getSelection();
-            if ($isRangeSelection(selection))
-              selection.insertRawText(textContent);
-          }
+        const selection = $getSelection();
+        if (selection && $isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createCodeNode());
         }
       });
     }
@@ -309,7 +287,7 @@ function FontDropDown({
     (option: string) => {
       editor.update(() => {
         const selection = $getSelection();
-        if ($isRangeSelection(selection)) {
+        if (selection && $isRangeSelection(selection)) {
           $patchStyleText(selection, {
             [style]: option,
           });
@@ -381,7 +359,7 @@ export default function ToolbarPlugin(): JSX.Element {
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
-    if ($isRangeSelection(selection)) {
+    if (selection && $isRangeSelection(selection)) {
       const anchorNode = selection.anchor.getNode();
       let element =
         anchorNode.getKey() === "root"

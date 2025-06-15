@@ -22,7 +22,7 @@ const page = () => {
 
   const handleLogin = async (token: string) => {
     const response = await axios.post(
-      "http://localhost:3001/api/auth/google/callback",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google/callback`,
       { token: token }
     );
 

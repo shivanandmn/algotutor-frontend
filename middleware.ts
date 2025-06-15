@@ -41,4 +41,4 @@ export const config = {
     // Match all question routes
     '/question/:path*'
   ],
-} as const;
+};
