@@ -36,6 +36,35 @@ export interface CodeSubmission {
   language: string;
 }
 
+export interface TestResult {
+  test_case_id: string;
+  passed: boolean;
+  execution_time: number;
+  memory_used: number;
+  output: string | null;
+  error: string | null;
+}
+
+export interface SubmissionResponse {
+  submission_id: string;
+  status: 'queued' | 'processing' | 'completed' | 'error' | 'pending' | 'running';
+  message: string;
+  results: TestResult[] | null;
+  total_passed: number;
+  total_tests: number;
+  execution_time: number;
+  memory_used: number;
+  error: boolean;
+  success: boolean;
+  input: string | null;
+  expected_output: string | null;
+  output_value: string | null;
+  submitted_at: string;
+}
+
+export interface SubmissionStatus extends SubmissionResponse {}
+
+
 export interface ApiError {
   message: string;
   status: number;
@@ -101,7 +130,7 @@ export const questionApi = {
     }
   },
 
-  submit: async (slug: string, code: string, language: string): Promise<unknown> => {
+  submit: async (slug: string, code: string, language: string): Promise<SubmissionResponse> => {
     try {
       const submission: CodeSubmission = {
         question_id: slug,
@@ -109,13 +138,25 @@ export const questionApi = {
         language
       };
       const response = await axios.post(
-        `${API_BASE_URL}/api/v1/code/submit/`,
+        `${API_BASE_URL}/api/v1/code/submit`,
         submission,
         { headers: getAuthHeaders() }
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      return handleApiError(error);
+    }
+  },
+  
+  getStatus: async (submissionId: string): Promise<SubmissionStatus> => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/v1/code/status/${submissionId}`,
+        { headers: getAuthHeaders() }
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(error);
     }
   }
 } as const;
