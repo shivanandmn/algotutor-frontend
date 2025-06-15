@@ -1,6 +1,4 @@
 import axios, { AxiosError } from 'axios';
-import { config } from '../config';
-import { buildApiUrl } from '../utils/url';
 
 // Types
 export interface CodeSnippet {
@@ -51,11 +49,22 @@ function getAuthHeaders() {
   } as const;
 }
 
-function handleApiError(error: unknown): never {
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function handleApiError(error: unknown): Promise<never> {
   if (axios.isAxiosError(error)) {
+    const status = error.response?.status || 500;
+    // If rate limited (500 error), wait and retry once
+    if (status === 500) {
+      await sleep(1000); // Wait 1 second before retry
+      return Promise.reject({
+        message: 'Rate limited, please try again',
+        status: status
+      });
+    }
     const apiError: ApiError = {
       message: error.response?.data?.message || error.message,
-      status: error.response?.status || 500
+      status: status
     };
     throw apiError;
   }
@@ -63,29 +72,32 @@ function handleApiError(error: unknown): never {
 }
 
 // API Client
+// Access environment variable directly - in Next.js, NEXT_PUBLIC_ variables are exposed to the browser
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export const questionApi = {
   list: async (): Promise<Question[]> => {
     try {
       const response = await axios.get(
-        buildApiUrl(config.api.endpoints.questions),
+        `${API_BASE_URL}/api/v1/question/`,
         { headers: getAuthHeaders() }
       );
       const questions = Array.isArray(response.data) ? response.data : response.data?.data || [];
       return questions;
     } catch (error) {
-      handleApiError(error);
+      return handleApiError(error);
     }
   },
 
   get: async (slug: string): Promise<Question> => {
     try {
       const response = await axios.get(
-        buildApiUrl(config.api.endpoints.questions, slug),
+        `${API_BASE_URL}/api/v1/question/by-slug/${slug}`,
         { headers: getAuthHeaders() }
       );
       return response.data;
     } catch (error) {
-      handleApiError(error);
+      return handleApiError(error);
     }
   },
 
@@ -97,7 +109,7 @@ export const questionApi = {
         language
       };
       const response = await axios.post(
-        buildApiUrl(config.api.endpoints.codeSubmit),
+        `${API_BASE_URL}/api/v1/code/submit/`,
         submission,
         { headers: getAuthHeaders() }
       );

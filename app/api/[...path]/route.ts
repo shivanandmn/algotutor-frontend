@@ -7,9 +7,11 @@ interface ApiError {
 }
 
 function getBackendPath(path: string): string {
+  // Remove 'api' from the start and preserve trailing slash
+  const hasTrailingSlash = path.endsWith('/');
   const parts = path.split('/').filter(Boolean);
-  const relevantParts = parts.slice(1); // Remove 'api' from the start
-  return '/api/' + relevantParts.join('/');
+  const relevantParts = parts.slice(1);
+  return '/api/' + relevantParts.join('/') + (hasTrailingSlash ? '/' : '');
 }
 
 async function handleRequest(
@@ -19,6 +21,7 @@ async function handleRequest(
   const backendPath = getBackendPath(request.nextUrl.pathname);
   const baseUrl = new URL(config.api.url);
   baseUrl.pathname = backendPath;
+  console.log('[API PROXY] Forwarding to backend URL:', baseUrl.toString());
 
   if (method === 'GET') {
     const searchParams = request.nextUrl.searchParams.toString();
@@ -52,7 +55,7 @@ async function handleRequest(
     const data = await response.json();
 
     // Special handling for questions list endpoint
-    if (backendPath === '/api/v1/questions' && method === 'GET') {
+    if (backendPath === '/api/v1/question' && method === 'GET') {
       const questions = Array.isArray(data) ? data : data?.data || [];
       return NextResponse.json(questions);
     }

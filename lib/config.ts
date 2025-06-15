@@ -10,8 +10,8 @@ export const config = {
     url: process.env.NEXT_PUBLIC_API_URL,
     baseUrl: '/api/v1',
     endpoints: {
-      questions: '/questions',
-      codeSubmit: '/code/submit'
+      questions: '/question/',
+      codeSubmit: '/code/submit/'
     },
     cors: {
       allowOrigin: '*',
