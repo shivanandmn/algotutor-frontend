@@ -1,4 +1,8 @@
 "use client";
+
+export const dynamic = "force-dynamic";
+
+import { Suspense } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Code, Plus, Trash2, Users } from "lucide-react";
@@ -56,7 +60,16 @@ export interface SavedQuestion {
   __v: number;
 }
 
-function Page() {
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent />
+    </Suspense>
+  );
+}
+
+function PageContent() {
   const searchParams = useSearchParams();
 
   const section = searchParams.get("section");
@@ -473,4 +486,3 @@ function Page() {
   );
 }
 
-export default Page;

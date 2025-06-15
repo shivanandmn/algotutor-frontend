@@ -1,5 +1,9 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
+import { Suspense } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useStore from "@/lib/store/UserStore";
@@ -8,7 +12,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-const page = () => {
+function PageContent() {
   const { login, isLogged } = useStore();
   const searchParams = useSearchParams();
 
@@ -67,6 +71,13 @@ const page = () => {
       </div>
     </div>
   );
-};
+}
 
-export default page;
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent />
+    </Suspense>
+  );
+}
