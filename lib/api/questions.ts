@@ -108,7 +108,7 @@ export const questionApi = {
   list: async (): Promise<Question[]> => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/api/v1/question/`,
+        `${API_BASE_URL}/api/v1/question`,
         { headers: getAuthHeaders() }
       );
       const questions = Array.isArray(response.data) ? response.data : response.data?.data || [];
