@@ -58,7 +58,7 @@ import {
   mergeRegister,
 } from "@lexical/utils";
 import DropDown, { DropDownItem } from "../DropDown";
-import { sanitizeUrl } from "@/lib/url";
+
 import { getSelectedNode } from "@/lib/getSelectedNode";
 
 const blockTypeToBlockName = {
@@ -500,7 +500,7 @@ export default function ToolbarPlugin(): JSX.Element {
 
   const insertLink = useCallback(() => {
     if (!isLink) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl("https://"));
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, "https://");
     } else {
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     }

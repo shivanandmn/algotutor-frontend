@@ -26,7 +26,7 @@ import { createPortal } from "react-dom";
 
 import { getSelectedNode } from "@/lib/getSelectedNode";
 import { setFloatingElemPositionForLinkEditor } from "@/lib/setFloatingElemPositionForLinkEditor";
-import { sanitizeUrl } from "@/lib/url";
+
 
 function FloatingLinkEditor({
   editor,
@@ -180,7 +180,7 @@ function FloatingLinkEditor({
   const handleLinkSubmission = () => {
     if (lastSelection !== null) {
       if (linkUrl !== "") {
-        editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl(editedLinkUrl));
+        editor.dispatchCommand(TOGGLE_LINK_COMMAND, editedLinkUrl.trim());
       }
       setEditedLinkUrl("https://");
       setIsLinkEditMode(false);
@@ -225,7 +225,7 @@ function FloatingLinkEditor({
       ) : (
         <div className="link-view">
           <a
-            href={sanitizeUrl(linkUrl)}
+            href={linkUrl.trim()}
             target="_blank"
             rel="noopener noreferrer"
           >
