@@ -12,6 +12,7 @@
     "@lexical/react": "^0.13.0",
     "@lexical/rich-text": "^0.13.0",
     "@livekit/components-react": "^2.9.9",
+    "@livekit/components-styles": "^1.1.6",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",

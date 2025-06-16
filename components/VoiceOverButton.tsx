@@ -5,8 +5,9 @@ import {
   RoomAudioRenderer,
   useConnectionState,
   useDataChannel,
-  useLocalParticipant
+  useLocalParticipant,
 } from "@livekit/components-react";
+import "@livekit/components-styles";
 import { ConnectionState } from "livekit-client";
 import { motion } from "framer-motion";
 import { useCallback, useState, useEffect } from "react";
