@@ -63,7 +63,7 @@ function PageContent() {
           href={"/"}
           className="font-bold dark:text-primary  text-[18px] tracking-widest "
         >
-          MyCodeJudge
+          AlgoTutor
         </Link>
       </header>
       <div className="w-full h-screen flex justify-center items-center">

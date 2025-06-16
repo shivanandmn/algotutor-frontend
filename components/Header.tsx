@@ -13,7 +13,7 @@ function Header() {
         href={"/"}
         className="font-bold dark:text-primary tracking-wider text-[18px]"
       >
-        MyCodeJudge
+        AlgoTutor
       </Link>
 
       <div className="flex text-gray-200 gap-4 items-center">

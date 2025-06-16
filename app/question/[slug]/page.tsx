@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import Header from "@/components/Header";
+import VoiceOverButton from "@/components/VoiceOverButton";
 import useStore from "@/lib/store/UserStore";
 import { cn } from "@/lib/utils";
 import { questionApi, type Question, type SubmissionResponse, type SubmissionStatus, type CodeSnippet } from "@/lib/api/questions";
@@ -166,14 +167,14 @@ function Page({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 h-screen">
       <Header />
       <ResizablePanelGroup
         direction="horizontal"
-        className="min-h-[calc(100vh-8rem)] rounded-lg border"
+        className="h-[calc(100vh-8rem)] rounded-lg border overflow-hidden"
       >
         <ResizablePanel defaultSize={50}>
-          <div className="flex h-full flex-col gap-4 p-4">
+          <div className="flex flex-col gap-4 p-4 overflow-auto h-[calc(100vh-8rem)]">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{questionData.title}</h1>
               <span
@@ -197,6 +198,9 @@ function Page({ params }: { params: { slug: string } }) {
                 <span key={topic} className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{topic}</span>
               ))}
             </div>
+            <div className="mb-4">
+              <VoiceOverButton context={questionData.content || "No content available for this question."} />
+            </div>
             <div
               className="prose max-w-none dark:prose-invert"
               dangerouslySetInnerHTML={{ __html: questionData.content }}
@@ -205,7 +209,7 @@ function Page({ params }: { params: { slug: string } }) {
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel defaultSize={50}>
-          <div className="flex h-full flex-col gap-4 p-4">
+          <div className="flex flex-col gap-4 p-4 overflow-auto h-[calc(100vh-8rem)]">
             <select
               className="w-32 rounded-md border p-2"
               value={selectedLangIndex}
@@ -222,7 +226,7 @@ function Page({ params }: { params: { slug: string } }) {
               ))}
             </select>
             <Editor
-              height="calc(100vh - 16rem)"
+              height="calc(100vh - 20rem)"
               language={questionData.code_snippets?.[selectedLangIndex]?.langSlug || 'python'}
               value={editorValue}
               onChange={(value) => setEditorValue(value || "")}

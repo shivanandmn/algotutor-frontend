@@ -171,7 +171,7 @@ function PageContent() {
     <div className="min-h-screen max-h-screen min-w-screen max-w-screen  p-8 pt-4 dark bg-black">
       <header className="flex justify-between border-b-2 pb-2">
         <span className="font-bold dark:text-primary tracking-wider text-[18px]">
-          MyCodeJudge
+          AlgoTutor
         </span>
 
         <Avatar>

@@ -1,5 +1,5 @@
 {
-  "name": "mycodejudge",
+  "name": "algotutor",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
   "dependencies": {
     "@lexical/react": "^0.13.0",
     "@lexical/rich-text": "^0.13.0",
+    "@livekit/components-react": "^2.9.9",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
@@ -33,7 +34,9 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.3.1",
+    "framer-motion": "^12.18.1",
     "lexical": "^0.13.0",
+    "livekit-client": "^2.13.4",
     "lucide-react": "^0.312.0",
     "monaco-editor": "^0.45.0",
     "monaco-languages": "^2.11.1",
